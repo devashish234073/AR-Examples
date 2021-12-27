@@ -3,11 +3,11 @@
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<title>Hello, AR Cube!</title>
 	<!-- include three.js library -->
-	<script src='js/three.js'></script>
-	<script src='js/OBJLoader.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/86/three.js'></script>
 	<!--<script src="https://threejs.org/build/three.min.js"></script>-->
-	<script src="https://threejs.org/examples/js/loaders/GLTFLoader.js"></script>
-	<script src="https://threejs.org/examples/js/loaders/SVGLoader.js"></script>
+	<!--<script src="https://threejs.org/examples/js/loaders/GLTFLoader.js"></script>-->
+	<script src="https://rawcdn.githack.com/mrdoob/three.js/r86/examples/js/loaders/GLTFLoader.js"></script>
+	<script src="https://rawcdn.githack.com/mrdoob/three.js/r86/examples/js/loaders/STLLoader.js"></script>
 	<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 	<!-- include jsartookit -->
 	<script src="jsartoolkit5/artoolkit.min.js"></script>
@@ -133,80 +133,27 @@ function initialize()
 	mesh3.position.y = 1.5;
 	markerRoot1.add( mesh3 );
 
-    //////////////////OBJ LOADER//////////////////////////
-	// instantiate a loader
-const loader = new THREE.SVGLoader();
-
-// load a SVG resource
-loader.load(
-	// resource URL
-	'models/monkey.svg',
-	// called when the resource is loaded
-	function ( data ) {
-
-		const paths = data.paths;
-		const group = new THREE.Group();
-
-		for ( let i = 0; i < paths.length; i ++ ) {
-
-			const path = paths[ i ];
-
-			const material = new THREE.MeshBasicMaterial( {
-				color: path.color,
-				side: THREE.DoubleSide,
-				depthWrite: false
-			} );
-
-			const shapes = THREE.SVGLoader.createShapes( path );
-
-			for ( let j = 0; j < shapes.length; j ++ ) {
-
-				const shape = shapes[ j ];
-				const geometry = new THREE.ShapeGeometry( shape );
-				const mesh = new THREE.Mesh( geometry, material );
-				group.add( mesh );
-
-			}
-
-		}
-
-		markerRoot1.add( group );
-
-	},
-	// called when loading is in progresses
-	function ( xhr ) {
-
-		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-	},
-	// called when loading has errors
-	function ( error ) {
-
-		console.log( 'An error happened' );
-
-	}
-);
-	//////////////////////////////////////////////////////
-
-
-	/*const loader = new THREE.GLTFLoader();
-	loader.load('models/monkey.glb', function (gltf) {
-    gltf.scene.traverse(function (child) {
-        if (child.isMesh) {
-            const m = child;
-            m.receiveShadow = true;
-            m.castShadow = true;
-        }
-        if (child.isLight) {
-            const l = child;
-            l.castShadow = true;
-            l.shadow.bias = -0.003;
-            l.shadow.mapSize.width = 2048;
-            l.shadow.mapSize.height = 2048;
-        }
-    });
-    scene.add(gltf.scene);
-    });*/
+    //////////////////STL LOADER//////////////////////////
+	const loader = new THREE.STLLoader();
+    loader.load(
+    'models/monkey.stl',
+    function (geometry) {
+		var materialSTL = new THREE.MeshNormalMaterial({
+		transparent: true,
+		opacity: 0.95,
+		side: THREE.DoubleSide
+	});
+        const mesh = new THREE.Mesh(geometry, materialSTL)
+        markerRoot1.add(mesh)
+    },
+    (xhr) => {
+        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+    },
+    (error) => {
+        console.log(error)
+    }
+    );
+	//////////////////////////////////////////////
 }
 
 function createMesh(transparency, size) {
